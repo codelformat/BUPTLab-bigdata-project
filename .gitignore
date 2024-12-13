@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# shared models
+shared_models/
+api_bakup/
+arxiv_vector_store_cs/
+paper_downloader.py
+vectorize_arxiv.py
+test_arxiv_vectors.py
+__pycache__/

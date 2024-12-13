@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { FileIcon, UploadCloudIcon, XIcon } from 'lucide-react';
+import { documentService } from '@/services/api/endpoints';
 
 interface UploadedFile {
   id: string;
@@ -28,17 +29,9 @@ export default function DocumentUpload() {
     // Upload each file
     newFiles.forEach(async (fileInfo, index) => {
       const file = acceptedFiles[index];
-      const formData = new FormData();
-      formData.append('file', file);
 
       try {
-        const response = await fetch('http://localhost:9090/pdfs', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!response.ok) throw new Error('Upload failed');
-
+        await documentService.upload(file);
         setFiles((prev) =>
           prev.map((f) =>
             f.id === fileInfo.id

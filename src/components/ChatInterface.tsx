@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { SendIcon } from 'lucide-react';
+import { chatService } from '@/services/api/endpoints';
 
 interface ChatMessage {
   id: string;
@@ -31,17 +32,7 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:9090/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: inputMessage }),
-      });
-
-      if (!response.ok) throw new Error('Failed to get response');
-
-      const data = await response.json();
+      const data = await chatService.sendMessage(inputMessage);
       
       const aiResponse: ChatMessage = {
         id: Date.now().toString(),

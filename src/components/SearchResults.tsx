@@ -1,13 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface SearchResult {
-  id: string;
-  title: string;
-  content: string;
-  relevanceScore: number;
-}
+import { searchService } from '@/services/api/endpoints';
+import type { SearchResult } from '@/services/api/types';
 
 export default function SearchResults() {
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -19,19 +14,7 @@ export default function SearchResults() {
     setError(null);
 
     try {
-      const response = await fetch(
-        `http://localhost:9090/search?q=${encodeURIComponent(query)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch results');
-
-      const data = await response.json();
+      const data = await searchService.search(query);
       setResults(data.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
