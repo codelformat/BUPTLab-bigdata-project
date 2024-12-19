@@ -48,3 +48,5 @@ paper_downloader.py
 vectorize_arxiv.py
 test_arxiv_vectors.py
 __pycache__/
+arxiv-metadata-oai-snapshot.json
+*.ipynb

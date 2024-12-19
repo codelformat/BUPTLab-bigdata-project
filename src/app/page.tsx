@@ -1,23 +1,27 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import SearchResults from '@/components/SearchResults';
 import ChatInterface from '@/components/ChatInterface';
 import DocumentUpload from '@/components/DocumentUpload';
 import ModeToggle from '@/components/ModeToggle';
+import type { SearchResult } from '@/services/api/types';
+import type { ChatMessage } from '@/components/ChatInterface';
 
 type SearchMode = 'search' | 'chat' | 'document';
 
 export default function Home() {
   const [searchMode, setSearchMode] = useState<SearchMode>('search');
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchResultsRef = useRef<any>(null);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const handleSearch = (query: string) => {
-    if (searchResultsRef.current) {
-      searchResultsRef.current.fetchSearchResults(query);
-    }
+  const handleSearchResults = (results: SearchResult[]) => {
+    setSearchResults(results);
+  };
+
+  const handleChatMessages = (messages: ChatMessage[]) => {
+    setChatMessages(messages);
   };
 
   return (
@@ -32,16 +36,17 @@ export default function Home() {
           
           {searchMode === 'search' && (
             <>
-              <SearchBar 
-                query={searchQuery} 
-                onQueryChange={setSearchQuery}
-                onSearch={handleSearch}
-              />
-              <SearchResults ref={searchResultsRef} />
+              <SearchBar onSearchResults={handleSearchResults} />
+              <SearchResults results={searchResults} />
             </>
           )}
           
-          {searchMode === 'chat' && <ChatInterface />}
+          {searchMode === 'chat' && (
+            <ChatInterface 
+              messages={chatMessages}
+              onMessagesChange={handleChatMessages}
+            />
+          )}
           
           {searchMode === 'document' && <DocumentUpload />}
         </div>
