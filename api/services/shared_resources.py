@@ -4,12 +4,15 @@ import openai
 import torch
 import gc
 from typing import Optional
+from FlagEmbedding import FlagReranker
+from elasticsearch import Elasticsearch
 
 class SharedResources:
     # 静态变量声明
     _embeddings: Optional[HuggingFaceBgeEmbeddings] = None
     _vector_store: Optional[FAISS] = None
     _client: Optional[openai.OpenAI] = None
+    _es: Optional[Elasticsearch] = None
     _initialized: bool = False
     
     def __init__(self):
@@ -41,16 +44,21 @@ class SharedResources:
             }
             
             cls._embeddings = HuggingFaceBgeEmbeddings(
-                model_name="../shared_models/BAAI/bge-m3",
+                model_name="../../shared_models/BAAI/bge-m3",
                 model_kwargs=model_kwargs,
                 encode_kwargs=encode_kwargs
             )
             
             # 初始化 vector store
             cls._vector_store = FAISS.load_local(
-                "../arxiv_vector_store_cs",
+                "../../arxiv_vector_store_cs",
                 cls._embeddings,
                 allow_dangerous_deserialization=True
+            )
+            
+            cls._reranker_model = FlagReranker(
+                model_name_or_path="../../shared_models/BAAI/bge-reranker-large",
+                use_fp16=True
             )
             
             # 初始化 OpenAI client
@@ -58,6 +66,8 @@ class SharedResources:
                 api_key="c4ed4d9021634ba2a992fe155b0eb65c",
                 base_url="https://api.lingyiwanwu.com/v1"
             )
+            
+            cls._es = Elasticsearch([{'scheme': 'http', 'host': 'localhost', 'port': 9200}])
             
             cls._initialized = True
             
@@ -84,6 +94,14 @@ class SharedResources:
     @property
     def client(self) -> openai.OpenAI:
         return self._client
+    
+    @property
+    def es(self) -> Elasticsearch:
+        return self._es
+    
+    @property
+    def reranker_model(self) -> FlagReranker:
+        return self._reranker_model
     
     @property
     def remote_model_name(self) -> str:
