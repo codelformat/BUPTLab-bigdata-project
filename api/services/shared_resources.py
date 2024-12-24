@@ -6,6 +6,20 @@ import gc
 from typing import Optional
 from FlagEmbedding import FlagReranker
 from elasticsearch import Elasticsearch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from typing import List, Tuple
+class RerankerModel:
+    def __init__(self, model_path: str):
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_path)
+        self.model.eval()
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+    @torch.no_grad()
+    def compute_score(self, pairs: List[List[str]]) -> List[Tuple[str, float]]:
+        inputs = self.tokenizer(pairs, padding=True, truncation=True, return_tensors="pt", max_length=8192)
+        scores = self.model(**inputs, return_dict=True).logits.view(-1, ).float()
+        
+        return [float(score) for score in scores]
 
 class SharedResources:
     # 静态变量声明
@@ -56,9 +70,8 @@ class SharedResources:
                 allow_dangerous_deserialization=True
             )
             
-            cls._reranker_model = FlagReranker(
-                model_name_or_path="../../shared_models/BAAI/bge-reranker-large",
-                use_fp16=True
+            cls._reranker_model = RerankerModel(
+                model_path="../../shared_models/BAAI/bge-reranker-large"
             )
             
             # 初始化 OpenAI client

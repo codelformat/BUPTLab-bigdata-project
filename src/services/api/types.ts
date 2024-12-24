@@ -5,7 +5,9 @@ export interface SearchResponse {
 export interface SearchResult {
   id: string;
   title: string;
-  content: string;
+  author: string;
+  abstract: string;
+  url: string;
   relevanceScore: number;
 }
 

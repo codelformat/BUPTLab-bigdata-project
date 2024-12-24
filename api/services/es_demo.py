@@ -27,4 +27,4 @@ response = es.search(index=index_name, body=query)
 # 输出结果
 print("Top 10 matching documents:")
 for hit in response['hits']['hits']:
-    print(f"ID: {hit['_id']}, Score: {hit['_score']}, Title: {hit['_source']['title']}, URL: https://arxiv.org/pdf/{hit['_id']}")
+    print(f"{hit['_source']['authors']}")

@@ -10,17 +10,22 @@ interface ParsedContent {
   url: string;
 }
 
-const parseContent = (content: string): ParsedContent => {
-  const titleMatch = content.match(/Title:\s*(.*?)\n/);
-  const authorMatch = content.match(/Author:\s*(.*?)\n/);
-  const abstractMatch = content.match(/Abstract:\s*(.*?)(?=\n\n\s*URL:)/s);
-  const urlMatch = content.match(/URL:\s*(.*?)$/);
+const parseContent = (content: SearchResult): ParsedContent => {
+  const titleMatch = content.title;
+  const authorMatch = content.author;
+  const abstractMatch = content.abstract;
+  const urlMatch = content.url;
+  console.log(content)
+  console.log(titleMatch)
+  console.log(authorMatch)
+  console.log(abstractMatch)
+  console.log(urlMatch)
 
   return {
-    title: titleMatch?.[1] || 'Untitled',
-    author: authorMatch?.[1] || 'Unknown Author',
-    abstract: abstractMatch?.[1]?.trim() || 'No abstract available',
-    url: urlMatch?.[1] || ''
+    title: titleMatch || 'Untitled',
+    author: authorMatch || 'Unknown Author',
+    abstract: abstractMatch || 'No abstract available',
+    url: urlMatch || ''
   };
 };
 
@@ -48,9 +53,11 @@ export default function SearchResults({ results }: SearchResultsProps) {
   return (
     <div className="w-full max-w-[90%] md:max-w-[70%] space-y-6">
       {results.map((result) => {
-        const { title, author, abstract, url } = parseContent(result.content);
-        console.log(result.content);
-        console.log(abstract);
+        const { title, author, abstract, url } = parseContent(result);
+        console.log(title)
+        console.log(author)
+        console.log(abstract)
+        console.log(url)
         const previewUrl = getPreviewImageUrl(url);
 
         return (

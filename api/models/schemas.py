@@ -4,7 +4,8 @@ from typing import List, Optional
 class SearchResult(BaseModel):
     id: str
     title: str
-    content: str
+    author: str
+    abstract: str
     url: str
     relevanceScore: float
 
